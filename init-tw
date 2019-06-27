@@ -1,0 +1,143 @@
+#! /bin/bash
+#------------------------------------------------------------------------------------------------------------------------------
+#TW-init v1.
+#To Initialize New Tumbleweed Installation.
+#Authour: Trodskovich
+#Run at your own Risk
+#------------------------------------------------------------------------------------------------------------------------------
+
+#declare Package Groups
+declare -a Multimedia_Codecs=(k3b-codecs ffmpeg ffmpegthumbs vlc phonon-backend-vlc phonon4qt5-backend-vlc libdvdcss2 libxine2-codecs) 
+declare -a Multimedia_Applications=( obs-studio kaffeine kodi kdenlive audacity inkscape) 
+declare -a Multimedia_Convertors=(handbrake-gtk winff) 
+declare -a Core_Applications=( zip unzip rar unrar fish ibus-m17n git git-gui artha wordnet wine) 
+declare -a Antivirus=(clamav clamtk) 
+declare -a Internet_Applications=( chromium chromium-pepper-flash flash-player) 
+declare -a Utilities=(unison dropbox krename kdeconnect-kde imagewriter filelight sweeper) 
+#For Pre Downloaded rpms
+declare -a Downloaded_Applications=(install jdk-9.0.4_linux-x64_bin.rpm skypeforlinux-64.rpm teamviewer_13.0.9865.x86_64.rpm wps-office-10.1.0.5672-1.a21.x86_64.rpm) 
+Downloaded_Path="~/Downloads/Installers/"
+declare -a Selected_Packages=()
+declare -a Rejected_Packages=()
+declare -i Selected_ctr=0
+declare -i Rejected_ctr=0
+
+#Function to segregate a Selected Pacages and Rejected Pacages Array
+function mk_list()
+{
+	local -n Proposed_Packages=$1
+	for i in ${Proposed_Packages[@]}; do
+
+		echo -e "\n \e[92m \n| $i |\n\e[39m"
+		zypper info $i
+
+		read -p "Do you want to install this package "$'\e[92m '"$i"$'\e[0m'"? [Yy/Nn] (y): " -n 1 -r choice
+		case "$choice" in 
+			y|Y|"") Selected_Packages[Selected_ctr]=$i
+				Selected_ctr=$Selected_ctr+1
+				;;
+			n|N) Rejected_Packages[Rejected_ctr]=$i
+				Rejected_ctr=$Rejected_ctr+1
+				;;
+			* ) echo "\n invalid choice only 'y' for yes and 'n' for No";;
+		esac
+	done
+}
+#To choose between Simple and Custom Initialisation
+case "$1" in 
+	-s|-S|--simple|"") #Parse all Package Groups. Default:
+		echo -e "\n No option selected, Begining with default simple Initialisation"
+		echo -e "\n\e[33m\e[1m| Adding New Repos |\e[2m\e[39m\n"
+		zypper addrepo -f http://ftp.gwdg.de/pub/linux/misc/packman/suse/openSUSE_Tumbleweed/ Packman
+
+
+		echo -e "\n\e[33m\e[1m| Refreshing All Repos |\e[2m\e[39m\n"
+		zypper refresh
+		zypper in ${Selected_Packages[@]} Multimedia_Codecs ${Multimedia_Applications[@]} ${Multimedia_Convertors[@]} ${Core_Applications[@]} ${Antivirus[@]} Internet_Applications[@]} ${Utilities[@]} #${Downloaded_Applications[@]}
+		echo -e "\n\e[33m\e[1m Updating Clamav Antivirus Definitions for the first time. \e[2m\e[39m\n"
+		freshclam
+		echo -e "\n\e[33m\e[1m Enabling Clamav Antivirus Daemon [clamd] and Defintion update Daemon [freshclam] to autostart. \e[2m\e[39m\n"
+		systemctl enable clamd
+		systemctl enable freshclam
+		systemctl start clamd
+		echo -e "\n\e[33m\e[1m| Tumbleweed Initialisation Complete. |\e[2m\e[39m\n"
+		;;
+	-c|-C|--custom) #To parse each group for selected list rejected list segregation.
+		echo -e -e "\n Begining with Custom Initialisation "
+		echo -e "\n\e[33m\e[1m| Adding New Repos |\e[2m\e[39m\n"
+		zypper addrepo -f http://ftp.gwdg.de/pub/linux/misc/packman/suse/openSUSE_Tumbleweed/ Packman
+
+
+		echo -e "\n\e[33m\e[1m| Refreshing All Repos |\e[2m\e[39m\n"
+		zypper refresh
+
+		echo -e "\n\e[33m\e[1m| Multimedia Codecs |\e[2m\e[39m\n"
+		mk_list Multimedia_Codecs
+
+		echo -e "\n\e[33m\e[1m| Multimedia Applications |\e[2m\e[39m\n"
+		mk_list Multimedia_Applications
+
+		echo -e "\n\e[33m\e[1m| Multimedia Convertors |\e[2m\e[39m\n"
+		mk_list Multimedia_Convertors
+
+		echo -e "\n\e[33m\e[1m| Core Applications |\e[2m\e[39m\n"
+		mk_list Core_Applications
+
+		echo -e "\n\e[33m\e[1m| Antivirus |\e[2m\e[39m\n"
+		mk_list Antivirus
+
+		echo -e "\n\e[33m\e[1m| Internet Applications |\e[2m\e[39m\n"
+		mk_list Internet_Applications
+
+		echo -e "\n\e[33m\e[1m| Utilities |\e[2m\e[39m\n"
+		mk_list Utilities
+
+		#uncoment the following three lines to install pre-downloaded rpms
+		# echo -e "\n\e[33m\e[1m| IDownloaded Softwares |\e[2m\e[39m\n"
+		# cd Downloaded_Path
+		# mk_list Downloaded_Applications
+
+
+		#To show selected and rejected list of Packages.
+		echo -e "\n These $Selected_ctr Packages are chosen for installtion"
+		echo -e "\e[32m ${Selected_Packages[@]} \e[39m"
+
+		echo -e "\n These $Rejected_ctr Packages are rejected for installtion"
+		echo -e "\e[31m ${Rejected_Packages[@]} \e[39m"
+		#To confirm installation of selected Packages
+		read -p "Do you want to install selected Packages ? [Yy/Nn] (y): " -n 1 -r choice
+		case "$choice" in 
+			y|Y ) echo -e "\n Selected Packages are going to be Installed along with Nessassary Dependencies "
+				zypper in ${Selected_Packages[@]}
+				echo -e "\n \e[33m\e[1m Updating Clamav Antivirus Definitions for the first time. \e[2m\e[39m\n"
+				freshclam
+				echo -e "\n\e[33m\e[1m Enabling Clamav Antivirus Daemon [clamd] and Defintion update Daemon [freshclam] to autostart. \e[2m\e[39m\n"
+				systemctl enable clamd
+				systemctl enable freshclam
+				systemctl start clamd
+				;;
+			n|N ) echo -e "\n Initilisation Aborted "
+				;;
+			* ) echo "invalid choice only 'y' for yes and 'n' for No";;
+		esac
+		echo -e "\n\e[33m\e[1m| Tumbleweed Initialisation Complete. |\e[2m\e[39m\n"
+
+		;;
+	-h|-H|--help) 
+		echo -e "\n Usage: init-tw [OPTION]... "
+		echo -e "\n Discription :script to initialize a new Tumbleweed installation. catagorized pakages are installed in a batch."
+		echo -e "\n [options]"
+		echo -e "\n -s, -S, --simple [default] Simple Initialisation accepting default Packges ."
+		echo -e "\n -c, -C, --custom Custom Initialisation, one can select the Packages to install or reject"
+		echo -e "\n -h, -H, --help To print this Help"
+		;;
+	* ) echo -e "invalid option type init-tw -h or init-tw --help to know more..."
+		;;
+esac
+
+
+
+
+
+
+
