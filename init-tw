@@ -7,7 +7,7 @@
 #------------------------------------------------------------------------------------------------------------------------------
 
 #declare Package Groups
-declare -a Multimedia_Codecs=(ffmpeg-4 ffmpegthumbs libxine2-codecs gstreamer gstreamer-plugins-bad gstreamer-plugins-bad gstreamer-plugins-base gstreamer-plugins-good gstreamer-plugins-good-extra gstreamer-plugins-good-gtk gstreamer-plugins-libav gstreamer-plugins-qt5 gstreamer-plugins-ugly vlc-codec-gstreamer) 
+declare -a Multimedia_Codecs=(ffmpeg-4 ffmpegthumbs libxine2-codecs gstreamer gstreamer-plugins-bad gstreamer-plugins-base gstreamer-plugins-good gstreamer-plugins-good-extra gstreamer-plugins-good-gtk gstreamer-plugins-libav gstreamer-plugins-qt5 gstreamer-plugins-ugly vlc-codec-gstreamer) 
 declare -a Multimedia_Applications=( obs-studio smplayer kodi kdenlive audacity inkscape vlc phonon-backend-vlc phonon4qt5-backend-vlc) 
 declare -a Multimedia_Convertors=(handbrake-gtk winff) 
 declare -a Core_Applications=( zip unzip rar unrar fish ibus-m17n git git-gui artha wordnet wine) 
