@@ -12,10 +12,17 @@ declare -a Multimedia_Applications=( obs-studio smplayer kodi kdenlive audacity 
 declare -a Multimedia_Convertors=(handbrake-gtk winff) 
 declare -a Core_Applications=( zip unzip rar unrar fish ibus-m17n git git-gui artha wordnet wine) 
 declare -a Antivirus=(clamav clamtk) 
+<<<<<<< HEAD
 declare -a Internet_Applications=( chromium flash-player-ppapi flash-player) 
 declare -a Utilities=(dropbox krename kdeconnect-kde imagewriter filelight sweeper) 
 #For Pre Downloaded rpms (Download and copy the installer files to 'Downloaded_Path' )
 declare -a Downloaded_Applications=(install jdk-12.0.1_linux-x64_bin.rpm skypeforlinux-64.rpm teamviewer-suse_14.3.4730.x86_64.rpm wps-office-11.1.0.8392-1.x86_64.rpm) 
+=======
+declare -a Internet_Applications=( chromium chromium-pepper-flash flash-player) 
+declare -a Utilities=(tmux rsync dropbox krename kdeconnect-kde imagewriter filelight sweeper) 
+#For Pre Downloaded rpms
+declare -a Downloaded_Applications=(install jdk-9.0.4_linux-x64_bin.rpm skypeforlinux-64.rpm teamviewer_13.0.9865.x86_64.rpm wps-office-10.1.0.5672-1.a21.x86_64.rpm) 
+>>>>>>> WIP
 Downloaded_Path="~/Downloads/Installers/"
 declare -a Selected_Packages=()
 declare -a Rejected_Packages=()
