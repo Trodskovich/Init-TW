@@ -12,10 +12,10 @@ declare -a Multimedia_Applications=(obs-studio smplayer kodi kdenlive audacity i
 declare -a Multimedia_Convertors=(handbrake-gtk winff) 
 declare -a Core_Applications=(zip unzip rar unrar fish ibus-m17n git git-gui artha wordnet wine) 
 declare -a Antivirus=(clamav clamtk) 
-declare -a Internet_Applications=(chromium flash-player-ppapi flash-player) 
+declare -a Internet_Applications=(chromium flash-player-ppapi flash-player)
 declare -a Utilities=(tmux rsync dropbox krename kdeconnect-kde imagewriter filelight sweeper) 
 #For Pre Downloaded rpms
-declare -a Downloaded_Applications=(install jdk-12.0.1_linux-x64_bin.rpm skypeforlinux-64.rpm teamviewer_14.3.4730.x86_64.rpm wps-office-11.1.0.8392-1.x86_64.rpm) 
+declare -a Downloaded_Applications=(jdk-12.0.1_linux-x64_bin.rpm skypeforlinux-64.rpm teamviewer_14.3.4730.x86_64.rpm wps-office-11.1.0.8392-1.x86_64.rpm) 
 Downloaded_Path="~/Downloads/Installers/"
 declare -a Selected_Packages=()
 declare -a Rejected_Packages=()
@@ -48,18 +48,20 @@ case "$1" in
 	-s|-S|--simple|"") #Parse all Package Groups. Default:
 		echo -e "\n No option selected, Begining with default simple Initialisation"
 		echo -e "\n\e[33m\e[1m| Adding New Repos |\e[2m\e[39m\n"
-		zypper addrepo -f http://ftp.gwdg.de/pub/linux/misc/packman/suse/openSUSE_Tumbleweed/ Packman
+		zypper ar -cfp 90 http://ftp.gwdg.de/pub/linux/misc/packman/suse/openSUSE_Tumbleweed/ Packman
 
 
 		echo -e "\n\e[33m\e[1m| Refreshing All Repos |\e[2m\e[39m\n"
 		zypper refresh
-		zypper in ${Selected_Packages[@]} Multimedia_Codecs ${Multimedia_Applications[@]} ${Multimedia_Convertors[@]} ${Core_Applications[@]} ${Antivirus[@]} Internet_Applications[@]} ${Utilities[@]} #${Downloaded_Applications[@]}
+		zypper in ${Selected_Packages[@]} ${Multimedia_Codecs[@]} ${Multimedia_Applications[@]} ${Multimedia_Convertors[@]} ${Core_Applications[@]} ${Antivirus[@]} ${Internet_Applications[@]} ${Utilities[@]} ${Downloaded_Applications[@]}
 		echo -e "\n\e[33m\e[1m Updating Clamav Antivirus Definitions for the first time. \e[2m\e[39m\n"
 		freshclam
 		echo -e "\n\e[33m\e[1m Enabling Clamav Antivirus Daemon [clamd] and Defintion update Daemon [freshclam] to autostart. \e[2m\e[39m\n"
 		systemctl enable clamd
 		systemctl enable freshclam
 		systemctl start clamd
+		echo -e "\n\e[33m\e[1m Distribution Updating openSUSE Tumblewed Installation. \e[2m\e[39m\n"
+		zypper dup -ly --allow-vendor-change
 		echo -e "\n\e[33m\e[1m| Tumbleweed Initialisation Complete. |\e[2m\e[39m\n"
 		;;
 	-c|-C|--custom) #To parse each group for selected list rejected list segregation.
@@ -115,6 +117,8 @@ case "$1" in
 				systemctl enable clamd
 				systemctl enable freshclam
 				systemctl start clamd
+				echo -e "\n\e[33m\e[1m Distribution Updating openSUSE Tumblewed Installation. \e[2m\e[39m\n"
+				zypper dup -ly --allow-vendor-change
 				;;
 			n|N ) echo -e "\n Initilisation Aborted "
 				;;
